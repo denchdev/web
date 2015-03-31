@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<f:view>
+    <h:head>
+        <title>Task manager</title>
+        <h:outputStylesheet library="css" name="stile.css"/>
+    </h:head>
+    <h:body styleClass="backOfPageStyle">
+        <div>
+            <h2><h:outputText value="SIMPLE TODO LIST"/></h2>
+            <h3><h:outputText value="FROM RUBY GARAGE"/></h3>
+        </div>
+        <h:form>
+            <div>
+                <h:dataTable id="table" value="#{managerTasks.list}" var="tasksVar" styleClass="tableOuter">
+                    <h:column >
+                        <h:dataTable id="table2" value="#{tasksVar.list}" var="taskVar"
+                                     styleClass="bodyOfTableStyle"
+                                     headerClass="headerStyle"
+                                     footerClass="footerStyle"
+                                     columnClasses="column1, column2, column3">
+                            <f:facet name="header">
+                                <table>
+                                    <tr><td>
+                                        <h:panelGrid styleClass="headerStyle1" id="topHead" columns="4" rendered="#{!tasksVar.editable}"
+                                                     columnClasses="columnOfHead1, columnOfHead2, columnOfHead3, columnOfHead3">
+                                            <h:graphicImage library="img" name="book.png"/>
+                                            <h:outputText value="#{tasksVar.name}" id="tasksOut"/>
+                                            <h:commandButton image="../resources/img/edit.png" action="#{tasksVar.editDo}" >
+                                                <f:ajax execute="tasksIn" render="table2"/>
+                                            </h:commandButton>
+                                            <h:commandButton image="../resources/img/delete.png" action="#{managerTasks.deleteTasks(tasksVar)}"/>
+                                        </h:panelGrid>
+                                        <h:panelGrid styleClass="headerStyle1" id="topHead2" columns="3" rendered="#{tasksVar.editable}"
+                                                     columnClasses="columnOfHead1, columnOfHead2, columnOfHead3">
+                                            <h:graphicImage library="img" name="add_32.gif"/>
+                                            <h:column>
+                                            <h:inputTextarea value="#{tasksVar.name}" id="tasksIn" required="true" cols="42" style="resize: none"
+                                                    requiredMessage="Поле не может быть пустым"
+                                                    validatorMessage="Поле не может быть таким длинным">
+                                               <f:validateLength maximum="40"/>
+                                            </h:inputTextarea>
+                                            <h:message for="tasksIn" />
+                                            </h:column>
+                                            <h:commandButton image="../resources/img/save.png" action="#{tasksVar.editSave(tasksVar.name)}">
+                                                <f:ajax execute="tasksIn" render="table2"/>
+                                            </h:commandButton>
+                                        </h:panelGrid>
+                                    </td></tr>
+                                    <tr><td>
+                                        <h:panelGrid styleClass="headerStyle2" id="topFooter" columns="3" rendered="true"
+                                                     columnClasses="columnOfHead1, columnOfHead2, columnOfHead3">
+                                            
+                                            <f:ajax><h:graphicImage library="img" name="add_32.gif"/>
+                                            <h:column>
+                                            <h:inputTextarea id="inS" value="#{tasksVar.taskName}" onclick="return this.value=''"
+                                                    required="true" cols="100" styleClass="textFieldTask"
+                                                    requiredMessage="Поле не может быть пустым"
+                                                    validatorMessage="Поле не может быть таким длинным">
+                                                <f:validateLength maximum="120"/>
+                                            </h:inputTextarea>
+                                                <h:message for="inS"/>
+                                            </h:column>
+                                            <h:commandButton value="Add Task" action="#{tasksVar.add()}" onclick="return document.getElementById('inS').value='';"
+                                                    styleClass="greenButton">
+                                                <f:ajax execute="inS" render="table2"/>
+                                            </h:commandButton></f:ajax>
+                                            
+                                        </h:panelGrid>
+                                    </td></tr>
+                                </table>
+                            </f:facet>
+                            <h:column>
+                                <h:selectBooleanCheckbox id="box" value="#{taskVar.done}" onchange="submit()"
+                                                         immediate="true"
+                                                         valueChangeListener="#{taskVar.boxListener}"/>
+                            </h:column>
+                            <h:column>
+                                <h:panelGrid columns="1" rendered="#{(!(taskVar.editable)) and !taskVar.done}">
+                                    <h:column>
+                                    <h:outputText id="textT" value="#{taskVar.name}"/>
+                                    </h:column>
+                                </h:panelGrid>
+                                <h:panelGrid columns="1" rendered="#{!taskVar.editable and taskVar.done}">
+                                    <h:column>
+                                        <h:outputText id="textTT" value="#{taskVar.name}" style="text-decoration: line-through"/>
+                                    </h:column>
+                                </h:panelGrid>
+                                <h:panelGrid columns="1" rendered="#{taskVar.editable}">
+                                    <h:column>
+                                    <h:inputText id="nameTask" value="#{taskVar.name}"/>
+                                    </h:column>
+                                </h:panelGrid>
+                            </h:column>
+                            <h:column>
+                                <h:panelGrid columns="3" rendered="#{!taskVar.editable}">
+                                    <h:column><h:commandButton image="../resources/img/up.png" action="#{tasksVar.upTask(taskVar)}"/></h:column>
+                                    <h:column><h:commandButton image="../resources/img/edit.png" action="#{taskVar.editDo}"/></h:column>
+                                    <h:column>
+                                        <h:commandButton image="../resources/img/delete.png" action="#{tasksVar.deleteTask(taskVar)}"/>
+                                    </h:column>
+                                </h:panelGrid>
+                                <h:panelGrid columns="1" rendered="#{taskVar.editable}">
+                                    <h:column>
+                                    <h:commandButton image="../resources/img/save.png" action="#{taskVar.editSave(taskVar.name)}" style="align-self: center"/>
+                                    </h:column>
+                                </h:panelGrid>
+                                </h:column>
+                            <f:facet name="footer">
+                                <br/>
+                                <br/>
+                            </f:facet>
+                        </h:dataTable>
+                    </h:column>
+                    <f:facet name="footer">
+                        <h:commandButton action="#{managerTasks.add}"  value="Add TODO list" styleClass="blueButton">
+                            <f:ajax render="table"/>
+                        </h:commandButton>
+                    </f:facet>
+                </h:dataTable>
+            </div>
+            <div id="footer">
+                <br/>
+                <br/>
+                <h:outputText value="By Denis Cherevatenko" style="font-size: smaller" />
+            </div>
+        </h:form>
+    </h:body>
+</f:view>
+</html>
